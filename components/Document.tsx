@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { db } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
-import useOwner from '@/lib/useOwnerHook';
+// import useOwner from '@/lib/useOwnerHook';
 
 function Document({ id: _id }: { id: string }) {
   const [data, loading, error] = useDocumentData(doc(db, 'documents', _id));

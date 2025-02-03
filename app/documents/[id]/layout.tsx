@@ -1,10 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
-
-async function DocLayout() {
-  const { userId } = await auth();
-  if (!userId) {
-    throw new Error('User is not authenticated');
-  }
-  return <div>DocLayout</div>;
+function DocLayout({
+  children,
+  params: { id },
+}: {
+  children: React.ReactNode;
+  params: { id: string };
+}) {
+  return <div>{children}</div>;
 }
 export default DocLayout;

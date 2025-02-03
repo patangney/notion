@@ -1,34 +1,34 @@
-"use server"; //any data fetching should be server side
-import { adminDb } from "@/firebase-admin";
-import { auth } from "@clerk/nextjs/server";
+'use server'; //any data fetching should be server side
+import { adminDb } from '@/firebase-admin';
+import { auth } from '@clerk/nextjs/server';
 
 export async function createNewDocument() {
   const authObj = await auth();
   if (!authObj) {
-    throw new Error("User is not authenticated");
+    throw new Error('User is not authenticated');
   }
-  const { sessionClaims } = authObj;
+  const { sessionClaims, redirectToSignIn } = authObj;
 
-  const docCollectionRef = adminDb.collection("documents");
+  if (!sessionClaims?.email) {
+    return redirectToSignIn();
+  }
+
+  const docCollectionRef = adminDb.collection('documents');
   const docRef = await docCollectionRef.add({
-    title: "New Document",
+    title: 'New Document',
   });
 
-  if (sessionClaims?.email) {
-    adminDb
-      .collection("users")
-      .doc(sessionClaims.email!)
-      .collection("rooms")
-      .doc(docRef.id)
-      .set({
-        userId: sessionClaims.email,
-        role: "owner",
-        createdAt: new Date(),
-        roomId: docRef.id,
-      });
-  } else {
-    throw new Error("Email is undefined");
-  }
+  adminDb
+    .collection('users')
+    .doc(sessionClaims.email!)
+    .collection('rooms')
+    .doc(docRef.id)
+    .set({
+      userId: sessionClaims.email,
+      role: 'owner',
+      createdAt: new Date(),
+      roomId: docRef.id,
+    });
 
   return { docId: docRef.id };
 }
