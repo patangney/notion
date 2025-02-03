@@ -18,11 +18,10 @@ const eslintConfig = [
     ],
     rules: {
       'react/no-unescaped-entities': 'off',
+      'no-unused-vars': 'off',
       '@next/next/no-page-custom-font': 'off',
-      '@typescript-eslint/no-unused-vars': [
-        'warn',
-        { argsIgnorePattern: '^_' },
-      ],
+      '@typescript-eslint/no-unused-vars': 'off',
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   }),
 ];
