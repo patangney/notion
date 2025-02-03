@@ -116,7 +116,7 @@ function Sidebar() {
 
   return (
     <div className="p-2 md:p-5 lg:p-10 xl:p-15 bg-gray-200 relative">
-      <div className="hidden md:block">{menuOptions}</div>
+      <div className="hidden md:block lg:block">{menuOptions}</div>
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger>
