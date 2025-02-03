@@ -12,7 +12,7 @@ function NewDocumentButton() {
     startTransition(async () => {
       // create new document
       const { docId } = await createNewDocument(); //create the server action
-      router.push(`/doc/${docId}`); //navigate to the new document
+      router.push(`/document/${docId}`); //navigate to the new document
     });
   };
   return (

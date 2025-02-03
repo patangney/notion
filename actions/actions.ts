@@ -3,7 +3,11 @@ import { adminDb } from "@/firebase-admin";
 import { auth } from "@clerk/nextjs/server";
 
 export async function createNewDocument() {
-  const { sessionClaims } = await auth();
+  const authObj = await auth();
+  if (!authObj) {
+    throw new Error("User is not authenticated");
+  }
+  const { sessionClaims } = authObj;
 
   const docCollectionRef = adminDb.collection("documents");
   const docRef = await docCollectionRef.add({
