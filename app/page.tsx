@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { ArrowLeftCircle } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-      <h1 className="text-4xl font-bold">Lets build an AI productivity app</h1>
-      <p className="text-lg">This is a Next.js app with Tailwind CSS</p>
+    <main className="flex space-x-2 items-center animate-pulse">
+      <ArrowLeftCircle className="w-12 h-12" size={32} />
 
-      <Button>Get started</Button>
+      <h1 className="font-bold">Get started with creating a new document</h1>
     </main>
   );
 }
