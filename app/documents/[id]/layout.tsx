@@ -1,10 +1,13 @@
-function DocLayout({
+import RoomProvider from "@/components/RoomProvider";
+
+async function DocLayout({
   children,
-  params: { id },
+  params,
 }: {
   children: React.ReactNode;
   params: { id: string };
 }) {
-  return <div>{children}</div>;
+  const { id } = await params;
+  return <RoomProvider roomId={id}>{children}</RoomProvider>;
 }
 export default DocLayout;
