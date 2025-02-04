@@ -7,32 +7,18 @@ import { db } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
 import Editor from './Editor';
-// import useOwner from '@/lib/useOwnerHook';
+import useOwner from '@/lib/useOwner';
 
 function Document({ id: _id }: { id: string }) {
   const [data, loading, error] = useDocumentData(doc(db, 'documents', _id));
   const [input, setInput] = useState(_id);
   const [isUpdating, startTransition] = useTransition();
-  // const isOwner = useOwner();
+  const isOwner = useOwner(); // create useOwner hook
 
   useEffect(() => {
-    // fetch document
-    if (loading) {
-      console.log('Loading data...');
-      return;
-    }
-    if (error) {
-      console.error('Error fetching data:', error);
-      return;
-    }
-    if (!data) {
-      console.log('No data found');
-      return;
-    }
-    if (data) {
-      setInput(data.title);
-    }
-  }, [data, loading, error]);
+    if (loading || !data) return;
+    setInput(data.title);
+  }, [data, loading]);
 
   const updateTitle = (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,6 +50,11 @@ function Document({ id: _id }: { id: string }) {
           </Button>
           {/* update title... */}
           {/* isOwner && inviteUser, DeleteDocument */}
+          {isOwner && (
+            <>
+              <p>I own this</p>
+            </>
+          )}
         </form>
         <div>
           {/* Manage Users */}
