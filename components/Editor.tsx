@@ -1,12 +1,34 @@
+'use client';
+import { useRoom } from '@liveblocks/react/suspense';
+import { useState } from 'react';
+import * as Y from 'yjs';
+import { LiveblocksYjsProvider } from '@liveblocks/yjs';
+import { Button } from './ui/button';
+import { MoonIcon, SunIcon } from 'lucide-react';
+
 function Editor() {
+  const room = useRoom(); // get access to room information
+  const [doc, setDoc] = useState<Y.Doc>();
+  const [provider, setProvider] = useState<LiveblocksYjsProvider>();
+  const [darkMode, setDarkMode] = useState(false);
+
+  const style = `hover:text-white ${
+    darkMode
+      ? 'text-gray-300 bg-gray-800 hover:bg-gray-100 hover:text-gray-800'
+      : 'text-gray-800 bg-gray-100 hover:bg-gray-800 hover:text-gray-100'
+  }`;
+
   return (
     <div className="max-w-6xl mx-auto">
-      <div>
+      <div className="flex items-center gap-2 justify-end mb-10">
         {/* translate doc */}
         {/* chat to document */}
         {/* dark mode */}
+        <Button className={style} onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? <SunIcon /> : <MoonIcon />}
+        </Button>
       </div>
-      {/* blocknote*/}
+      {/* Block Note*/}
     </div>
   );
 }
