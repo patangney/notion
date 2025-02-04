@@ -1,6 +1,6 @@
 'use client';
 import { useRoom, useSelf } from '@liveblocks/react/suspense';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import * as Y from 'yjs';
 import { LiveblocksYjsProvider } from '@liveblocks/yjs';
 import { Button } from './ui/button';
@@ -43,21 +43,25 @@ function BlockNote({ doc, provider, darkMode }: EditorProps) {
 }
 
 function Editor() {
-  const room = useRoom(); // get access to room information
-  const [doc, setDoc] = useState<Y.Doc>();
-  const [provider, setProvider] = useState<LiveblocksYjsProvider>();
+  const room = useRoom();
+  const [doc, setDoc] = useState<Y.Doc | null>(null);
+  const [provider, setProvider] = useState<LiveblocksYjsProvider | null>(null);
   const [darkMode, setDarkMode] = useState(false);
+
+  // Get a stable reference to the room ID
+  const roomId = useMemo(() => room.id, [room]);
 
   useEffect(() => {
     const yDoc = new Y.Doc();
     const yProvider = new LiveblocksYjsProvider(room, yDoc);
     setDoc(yDoc);
     setProvider(yProvider);
+
     return () => {
-      yDoc?.destroy();
+      yDoc.destroy();
       yProvider.destroy();
     };
-  }, [room]);
+  }, [room, roomId]);
 
   if (!doc || !provider) {
     return null;
@@ -72,14 +76,10 @@ function Editor() {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="flex items-center gap-2 justify-end mb-10">
-        {/* translate doc */}
-        {/* chat to document */}
-        {/* dark mode */}
         <Button className={style} onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? <SunIcon /> : <MoonIcon />}
         </Button>
       </div>
-      {/* Block Note*/}
       <BlockNote doc={doc} provider={provider} darkMode={darkMode} />
     </div>
   );
