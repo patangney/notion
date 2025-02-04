@@ -15,29 +15,44 @@ import stringToColor from '@/lib/stringToColor';
 
 type EditorProps = {
   doc: Y.Doc;
-  provider: any;
+  provider: LiveblocksYjsProvider;
   darkMode: boolean;
 };
 
 function BlockNote({ doc, provider, darkMode }: EditorProps) {
   const userInfo = useSelf((me) => me.info);
-  const editor: BlockNoteEditor = useCreateBlockNote({
+
+  // Memoize user info with proper fallbacks
+  const userConfig = useMemo(
+    () => ({
+      name: userInfo?.name || 'Anonymous',
+      color: stringToColor(userInfo?.email || 'default'),
+    }),
+    [userInfo?.name, userInfo?.email]
+  );
+
+  // Ensure fragment exists before creating editor
+  const fragment = useMemo(() => {
+    return doc.getXmlFragment('document-store') || doc.getXmlFragment();
+  }, [doc]);
+
+  const editor = useCreateBlockNote({
     collaboration: {
       provider,
-      fragment: doc.getXmlFragment('document-store'),
-      user: {
-        name: userInfo?.name,
-        color: stringToColor(userInfo?.email),
-      },
+      fragment,
+      user: userConfig,
     },
   });
+
   return (
     <div className="relative max-w-6xl mx-auto">
-      <BlockNoteView
-        className="min-h-screen"
-        editor={editor}
-        theme={darkMode ? 'dark' : 'light'}
-      />
+      {editor && (
+        <BlockNoteView
+          className="min-h-screen"
+          editor={editor}
+          theme={darkMode ? 'dark' : 'light'}
+        />
+      )}
     </div>
   );
 }
@@ -48,20 +63,33 @@ function Editor() {
   const [provider, setProvider] = useState<LiveblocksYjsProvider | null>(null);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Get a stable reference to the room ID
-  const roomId = useMemo(() => room.id, [room]);
+  // Stable room reference
+  const stableRoom = useMemo(() => room, [room.id]);
 
   useEffect(() => {
+    let isMounted = true;
     const yDoc = new Y.Doc();
-    const yProvider = new LiveblocksYjsProvider(room, yDoc);
-    setDoc(yDoc);
-    setProvider(yProvider);
+    const yProvider = new LiveblocksYjsProvider(stableRoom, yDoc);
+
+    // Initialize default content structure
+    const initContent = () => {
+      if (!yDoc.getXmlFragment('document-store')) {
+        yDoc.getXmlFragment('document-store');
+      }
+    };
+
+    if (isMounted) {
+      initContent();
+      setDoc(yDoc);
+      setProvider(yProvider);
+    }
 
     return () => {
+      isMounted = false;
       yDoc.destroy();
       yProvider.destroy();
     };
-  }, [room, roomId]);
+  }, [stableRoom]);
 
   if (!doc || !provider) {
     return null;
