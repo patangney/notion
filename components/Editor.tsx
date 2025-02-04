@@ -1,9 +1,14 @@
-
-
 function Editor() {
   return (
-    <div>Editor</div>
-  )
+    <div className="max-w-6xl mx-auto">
+      <div>
+        {/* translate doc */}
+        {/* chat to document */}
+        {/* dark mode */}
+      </div>
+      {/* blocknote*/}
+    </div>
+  );
 }
 
-export default Editor
+export default Editor;

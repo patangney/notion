@@ -6,6 +6,7 @@ import { Button } from './ui/button';
 import { db } from '@/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { useDocumentData } from 'react-firebase-hooks/firestore';
+import Editor from './Editor';
 // import useOwner from '@/lib/useOwnerHook';
 
 function Document({ id: _id }: { id: string }) {
@@ -68,8 +69,10 @@ function Document({ id: _id }: { id: string }) {
           {/* Manage Users */}
           {/* Avatars */}
         </div>
-        {/* Collaborative Editor */}
       </div>
+      <hr className="pb-10" />
+      {/* Collaborative Editor */}
+      <Editor />
     </div>
   );
 }
