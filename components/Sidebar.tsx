@@ -104,7 +104,7 @@ function Sidebar() {
             ))}
           </>
         )}
-      </div>
+      
 
       {/* List */}
       {/* Shared Documents */}
@@ -122,6 +122,7 @@ function Sidebar() {
           ))}
         </>
       )}
+      </div>
 
       {/* List */}
       {/* Trash */}

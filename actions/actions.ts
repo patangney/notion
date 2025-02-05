@@ -58,3 +58,35 @@ export async function deleteDocument(roomId: string) {
     return { success: false };
   }
 }
+
+export async function inviteUserToRoom(roomId: string, email: string) {
+  console.log('inviteUserToRoom', roomId, email);
+  try {
+    await adminDb.collection('users').doc(email).collection('rooms').doc(roomId).set({
+      userId: email,
+      role: 'editor',
+      createdAt: new Date(),
+      roomId,
+    });
+
+    return { success: true };
+
+  } catch (error) {
+    console.error('Error adding user to document', error);
+    return { success: false };
+
+  }
+
+};
+
+export async function removeUserFromDocument(roomId: string, userId: string) {
+  console.log('removeUserFromDocument', roomId, userId);
+
+  try {
+    await adminDb.collection('users').doc(userId).collection('rooms').doc(roomId).delete();
+    return { success: true };
+  } catch (error) {
+    console.error('Error removing user from document', error);
+    return { success: false };
+  }
+} 
