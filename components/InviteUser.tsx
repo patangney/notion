@@ -36,7 +36,7 @@ function InviteUser() {
       if (success) {
         setIsOpen(false);
         setEmail("");
-        router.replace("/");
+        // router.replace("/");
         toast.success("User Added to Document Successfully");
       } else {
         toast.error("An error occurred while adding user to the document");
@@ -75,13 +75,15 @@ function InviteUser() {
             value={email}
             onChange={handleEmailChange}
           />
-          {!isEmailValid && (
-            <p className="flex flex-1 justify-end text-red-700 mt-2">Please enter a valid email address.</p>
-          )}
+         
           <Button type="submit" disabled={!email || !isEmailValid || isPending}>
             {isPending ? "Inviting..." : "Invite"}
           </Button>
+          
         </form>
+        {!isEmailValid && (
+            <p className="flex flex-1 justify-start text-red-700 mt-1">Please enter a valid email address.</p>
+          )}
       </DialogContent>
     </Dialog>
   );

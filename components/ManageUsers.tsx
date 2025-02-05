@@ -52,16 +52,25 @@ function ManageUsers() {
     (doc) => doc.data().userId !== user?.emailAddresses[0].toString()
   ).length;
 
+  // Sort users so that the owner is always listed first, followed by editors
+  const sortedUsers = usersInRoom?.docs.sort((a, b) => {
+    if (a.data().role === "owner") return -1;
+    if (b.data().role === "owner") return 1;
+    return 0;
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <Button asChild variant="outline">
         <DialogTrigger>
-          {otherUsersCount === 0 ? "Share Document" : `Users (${otherUsersCount})`}
+          {otherUsersCount === 0 ? "Document Control" : `Shared with (${otherUsersCount}) Users`}
         </DialogTrigger>
       </Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Users with Access ({usersInRoom?.docs.length})</DialogTitle>
+          <DialogTitle>
+            {otherUsersCount === 0 ? "Not Shared" : `Users with Access (${otherUsersCount})`}
+          </DialogTitle>
           <DialogDescription>
             Below is a list of users with access to this document.
           </DialogDescription>
@@ -69,7 +78,7 @@ function ManageUsers() {
         <hr className="my-4" />
         <div className="flex flex-col space-y-2" >
           {/* map through users */}
-          {usersInRoom?.docs.map((doc) => (
+          {sortedUsers?.map((doc) => (
             <div key={`${doc.id}-${doc.data().userId}`} className="flex justify-between items-center">
               <p className="font-light">
                 {doc.data().userId === user?.emailAddresses[0].toString() ? (
