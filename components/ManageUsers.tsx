@@ -26,6 +26,7 @@ function ManageUsers() {
   const isOwner = useOwner();
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
 
   const [usersInRoom] = useCollection(
     user &&
@@ -36,7 +37,7 @@ function ManageUsers() {
   );
 
   const handleDelete = async (userId: string) => {
-    // Handle delete user logic here
+    setRemovingUserId(userId);
     startTransition(async () => {
       if (!user) return;
       const { success } = await removeUserFromDocument(room.id, userId);
@@ -45,6 +46,7 @@ function ManageUsers() {
       } else {
         console.log("Error removing user");
       }
+      setRemovingUserId(null);
     });
   };
 
@@ -55,7 +57,7 @@ function ManageUsers() {
   // Sort users so that the owner is always listed first, followed by editors
   const sortedUsers = usersInRoom?.docs.sort((a, b) => {
     if (a.data().role === "owner") return -1;
-    if (b.data().role === "owner") return 1;
+    if (b.data().role === "editor") return 1;
     return 0;
   });
 
@@ -97,13 +99,11 @@ function ManageUsers() {
                 {isOwner && doc.data().userId !== user?.emailAddresses[0].toString() && (
                   <Button
                     variant="destructive"
-                    onClick={() => {
-                      startTransition(() => handleDelete(doc.data().userId));
-                    }}
-                    disabled={isPending}
+                    onClick={() => handleDelete(doc.data().userId)}
+                    disabled={isPending && removingUserId === doc.data().userId}
                     size={"sm"}
                   >
-                    {isPending ? "Removing..." : "X"}
+                    {isPending && removingUserId === doc.data().userId ? "Removing..." : "X"}
                   </Button>
                 )}
               </div>
