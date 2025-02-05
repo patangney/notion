@@ -1,5 +1,6 @@
 'use server'; //any data fetching should be server side
 import { adminDb } from '@/firebase-admin';
+import liveblocks from '@/lib/liveblocks';
 import { auth } from '@clerk/nextjs/server';
 
 export async function createNewDocument() {
@@ -31,4 +32,29 @@ export async function createNewDocument() {
     });
 
   return { docId: docRef.id };
+}
+
+export async function deleteDocument(roomId: string) {
+  console.log('deleteDocument', roomId);
+
+  try {
+    await adminDb.collection('documents').doc(roomId).delete();
+    const query = await adminDb.collectionGroup('rooms').where('roomId', '==', roomId).get(); // get all rooms with roomId
+    const batch = adminDb.batch();
+
+    //delete the room reference in the user's collection for every user in the room
+    query.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    await liveblocks.deleteRoom(roomId);
+
+    return { success: true };
+
+  } catch (error) {
+    console.error('Error deleting document', error);
+    return { success: false };
+  }
 }
