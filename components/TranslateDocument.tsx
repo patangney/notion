@@ -120,14 +120,14 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
         <Button asChild variant="outline">
           <DialogTrigger>
             <LanguagesIcon size={24} />
-            Translate
+            Sumarrise
           </DialogTrigger>
         </Button>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Translate Document</DialogTitle>
+            <DialogTitle>Summarise Document</DialogTitle>
             <DialogDescription>
-              Select a language to translate the document to
+              Select a language to summarise document in
             </DialogDescription>
 
             <hr className="mt-5" />
@@ -142,7 +142,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
               <div className="flex justify-end mb-2">
                 <Button variant="outline" size="sm" onClick={handleClear}>
                   <BotIcon className="w-4 h-4 mr-2" />
-                  New Translation
+                  New Summary
                 </Button>
               </div>
               <div className="flex flex-col items-start max-h-96 overflow-y-scroll gap-2 p-5 bg-gray-100 rounded-lg w-full">
