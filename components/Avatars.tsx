@@ -18,7 +18,7 @@ function Avatars() {
     (id) => all.find((user) => user?.id === id)
   );
 
-  console.log(uniqueUsers);
+  // console.log(uniqueUsers);
   return (
     <div className="flex gap-2 items-center">
       <p className="font-light text-sm">Users currently editing this page</p>

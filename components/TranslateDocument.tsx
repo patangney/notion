@@ -67,6 +67,27 @@ const languages: Language[] = [
   'malay',
 ];
 
+const summariseTranslations: { [key in Language]: string } = {
+  english: 'Summarise',
+  spanish: 'Resumir',
+  french: 'Résumer',
+  german: 'Zusammenfassen',
+  italian: 'Riassumere',
+  portuguese: 'Resumir',
+  dutch: 'Samenvatten',
+  russian: 'Резюмировать',
+  japanese: '要約する',
+  korean: '요약하다',
+  chinese: '总结',
+  arabic: 'تلخيص',
+  hindi: 'सारांश',
+  turkish: 'Özetlemek',
+  vietnamese: 'Tóm tắt',
+  thai: 'สรุป',
+  indonesian: 'Merangkum',
+  malay: 'Ringkaskan',
+};
+
 function TranslateDocument({ doc }: { doc: Y.Doc }) {
   const [isOpen, setIsOpen] = useState(false);
   const [language, setLanguage] = useState<Language | null>(null);
@@ -81,20 +102,23 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
       const fragment = doc.getXmlFragment('document-store');
       const documentData = fragment.toString();
 
-      const id = toast.loading("Translating document...");
+      const id = toast.loading('Translating document...');
 
       try {
         // make request to cloudflare backend
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/translateDocument`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            documentData,
-            targetLanguage: language,
-          }),
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/translateDocument`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              documentData,
+              targetLanguage: language,
+            }),
+          }
+        );
 
         if (!res.ok) {
           throw new Error('Translation failed');
@@ -102,9 +126,9 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
 
         const { translated_text } = await res.json();
         setSummary(translated_text);
-        toast.success("Document translated successfully", { id });
+        toast.success('Document translated successfully', { id });
       } catch (error) {
-        toast.error("Failed to translate document", { id });
+        toast.error('Failed to translate document', { id });
       }
     });
   };
@@ -120,7 +144,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
         <Button asChild variant="outline">
           <DialogTrigger>
             <LanguagesIcon size={24} />
-            Sumarrise
+            Sumarrise Doc
           </DialogTrigger>
         </Button>
         <DialogContent>
@@ -129,12 +153,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
             <DialogDescription>
               Select a language to summarise document in
             </DialogDescription>
-
-            <hr className="mt-5" />
-            {/* Ask Question */}
-            {question && <p className="mt-5 text-gray-500">Q: {question}</p>}
           </DialogHeader>
-
 
           {/* render out open ai summary from translate */}
           {summary && (
@@ -149,12 +168,12 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
                 <div className="flex items-center gap-2 mb-2">
                   <BotIcon className="w-5 h-5" />
                   <p className="font-bold">
-                    Translation {isPending ? "in progress..." : ""}
+                    Translation {isPending ? 'in progress...' : ''}
                   </p>
                 </div>
                 <div className="w-full">
                   {isPending ? (
-                    "Translating..."
+                    'Translating...'
                   ) : (
                     <div className="prose max-w-none">
                       <Markdown>{summary}</Markdown>
@@ -164,8 +183,6 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
               </div>
             </>
           )}
-
-
 
           <form className="flex gap-2" onSubmit={handleAskQuestion}>
             <Select
@@ -185,7 +202,11 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
             </Select>
 
             <Button type="submit" disabled={!language || isPending}>
-              {isPending ? 'Translating...' : 'Translate'}
+              {isPending
+                ? 'Translating...'
+                : language
+                ? summariseTranslations[language]
+                : 'Translate'}
             </Button>
           </form>
         </DialogContent>
