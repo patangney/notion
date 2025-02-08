@@ -20,6 +20,7 @@ import {
   LanguagesIcon,
   MessageCircleCode,
 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 
 function TranslateDocument({ doc }: { doc: Y.Doc }) {
@@ -28,16 +29,16 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
   const [summary, setSummary] = useState('');
   const [question, setQuestion] = useState('');
   const [input, setInput] = useState('');
+  const [progress, setProgress] = useState(0);
 
   const handleAskQuestion = async (e: FormEvent) => {
     e.preventDefault();
     setQuestion(input);
+    setProgress(33); // Set initial progress
     startTransition(async () => {
       // get the data from the document
       const fragment = doc.getXmlFragment('document-store');
       const documentData = fragment.toString();
-
-      const id = toast.loading('Thinking...');
 
       try {
         // make request to cloudflare backend
@@ -64,10 +65,11 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
         const message = responseData.message || responseData; // Adjusted to handle different response structures
         console.log('Response message:', message); // Add logging here
         setSummary(message);
-        toast.success('Complete', { id });
+        setProgress(0); // Hide progress bar on success
       } catch (error) {
         console.error('Error:', error); // Add logging here
-        toast.error('Failed to access OpenAI', { id });
+        toast.error('Failed to access OpenAI');
+        setProgress(0); // Hide progress bar on error
       }
     });
   };
@@ -75,6 +77,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
   const handleClear = () => {
     setSummary('');
     setQuestion('');
+    setProgress(0); // Reset progress on clear
   };
 
   return (
@@ -116,7 +119,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
                 </div>
                 <div className="w-full">
                   {isPending ? (
-                    'Translating...'
+                    'Thinking...'
                   ) : (
                     <div className="prose max-w-none">
                       <Markdown>{summary}</Markdown>
@@ -146,9 +149,10 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
             </p>
           ) : (
             <p className="flex flex-1 justify-start text-green-700 mt-1">
-              <CheckCircle className="mr-1" />
+              <CheckCircle className="mr-1" /> Ready to ask question
             </p>
           )}
+          {progress > 0 && <Progress value={progress} className="mt-4" />}
         </DialogContent>
       </Dialog>
     </div>

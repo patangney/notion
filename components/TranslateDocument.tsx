@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from './ui/button';
 import { BotIcon, LanguagesIcon } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 
 type Language =
@@ -94,15 +95,15 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
   const [summary, setSummary] = useState('');
   const [question, setQuestion] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [progress, setProgress] = useState(0);
 
   const handleAskQuestion = async (e: FormEvent) => {
     e.preventDefault();
+    setProgress(33); // Set initial progress
     startTransition(async () => {
       // get the data from the document
       const fragment = doc.getXmlFragment('document-store');
       const documentData = fragment.toString();
-
-      const id = toast.loading('Translating document...');
 
       try {
         // make request to cloudflare backend
@@ -126,9 +127,10 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
 
         const { translated_text } = await res.json();
         setSummary(translated_text);
-        toast.success('Document translated successfully', { id });
+        setProgress(0); // Hide progress bar on success
       } catch (error) {
-        toast.error('Failed to translate document', { id });
+        toast.error('Failed to translate document');
+        setProgress(0); // Hide progress bar on error
       }
     });
   };
@@ -136,6 +138,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
   const handleClear = () => {
     setSummary('');
     setQuestion('');
+    setProgress(0); // Reset progress on clear
   };
 
   return (
@@ -144,7 +147,7 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
         <Button asChild variant="outline">
           <DialogTrigger>
             <LanguagesIcon size={24} />
-            Sumarrise Doc
+            Summarise Doc
           </DialogTrigger>
         </Button>
         <DialogContent>
@@ -209,9 +212,11 @@ function TranslateDocument({ doc }: { doc: Y.Doc }) {
                 : 'Translate'}
             </Button>
           </form>
+          {progress > 0 && <Progress value={progress} className="mt-4" />}
         </DialogContent>
       </Dialog>
     </div>
   );
 }
+
 export default TranslateDocument;
